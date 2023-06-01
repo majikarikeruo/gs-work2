@@ -9,6 +9,7 @@ import ScheduleItem from "@/components/home/ScheduleItem";
 export default function Home() {
   const [scheduleCount, setScheduleCount] = useState(1);
   const [username, setUsername] = useState("");
+  const [schedules, setSchedules] = useState([]);
 
   /**
    * @function submitSchedule
@@ -16,10 +17,27 @@ export default function Home() {
    */
   const submitSchedule = (e) => {
     e.preventDefault();
+    const json = { username, schedules };
 
-    const json = [{ name: username, schedules: [] }];
     localStorage.setItem(username, JSON.stringify(json));
+
+    alert("入力したスケジュールを送信しました！");
+    resetScheduleState();
   };
+
+  /**
+   * @function resetScheduleState
+   * @description 初期化
+   */
+  const resetScheduleState = () => {
+    setUsername("");
+    setSchedules([]);
+    setScheduleCount(1);
+  };
+
+  useEffect(() => {
+    console.log(schedules, "スケジュール");
+  }, [schedules]);
 
   return (
     <main
@@ -43,8 +61,12 @@ export default function Home() {
               <tbody>
                 {[...Array(scheduleCount)].map((schedule, index) => (
                   <ScheduleItem
+                    key={index}
+                    index={index}
                     scheduleCount={scheduleCount}
                     setScheduleCount={setScheduleCount}
+                    schedules={schedules}
+                    setSchedules={setSchedules}
                     enableDeleteBtn={index > 0 && index === scheduleCount - 1}
                   />
                 ))}
