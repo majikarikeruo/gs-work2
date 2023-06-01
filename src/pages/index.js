@@ -8,6 +8,14 @@ import ScheduleItem from "@/components/home/ScheduleItem";
 export default function Home() {
   const [scheduleCount, setScheduleCount] = useState(1);
 
+  /**
+   * @function submitSchedule
+   * @description スケジュール送信ボタン押下時の処理
+   */
+  const submitSchedule = (e) => {
+    e.preventDefault();
+  };
+
   return (
     <main
       className={`flex min-h-screen flex-col items-center justify-between p-24`}
@@ -48,6 +56,17 @@ export default function Home() {
               scheduleCount={scheduleCount}
               setScheduleCount={setScheduleCount}
             />
+            <p className="mt-8">
+              あくまで、基本的に何曜日何時くらいがいいかという希望を入れていただければ大丈夫です！
+            </p>
+            <div className="text-center">
+              <button
+                onClick={submitSchedule}
+                className="border-none p-4 px-4 w-80 bg-[#3ea8ff] text-white font-bold text-lg rounded-md"
+              >
+                入力した日程で送信する
+              </button>
+            </div>
           </div>
         </form>
       </div>
