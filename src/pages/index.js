@@ -35,13 +35,11 @@ export default function Home() {
     setScheduleCount(1);
   };
 
-  useEffect(() => {
-    console.log(schedules, "スケジュール");
-  }, [schedules]);
+  useEffect(() => {}, [schedules]);
 
   return (
     <main
-      className={`flex min-h-screen flex-col items-center justify-between p-24`}
+      className={`flex min-h-screen flex-col items-center justify-between py-16 px-3`}
     >
       <div>
         <Heading />
@@ -53,9 +51,15 @@ export default function Home() {
             <table className="w-full mb-4 -mx-2">
               <thead>
                 <tr>
-                  <th className="p-2 text-left">曜日（週末・平日）</th>
-                  <th className="p-2 text-left">開始時間</th>
-                  <th className="p-2 text-left">終了時間</th>
+                  <th className="p-2 text-left align-top">
+                    曜日
+                    <br className="lg:hidden" />
+                    <span className="text-[10px] lg:text-base">
+                      （週末・平日）
+                    </span>
+                  </th>
+                  <th className="p-2 text-left align-top">開始時間</th>
+                  <th className="p-2 text-left align-top">終了時間</th>
                 </tr>
               </thead>
               <tbody>
@@ -67,7 +71,6 @@ export default function Home() {
                     setScheduleCount={setScheduleCount}
                     schedules={schedules}
                     setSchedules={setSchedules}
-                    enableDeleteBtn={index > 0 && index === scheduleCount - 1}
                   />
                 ))}
               </tbody>

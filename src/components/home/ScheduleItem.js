@@ -4,9 +4,7 @@ import { useState, useEffect } from "react";
  *
  * Todo
  * 
- * - 同じ名前でかぶった場合はlocalStorage上で上書き
- * - 曜日もリセットできるように
- * - スマホ対応
+ * -  集計ページの作成
  * - デザイン演出リッチに
  * 
  * 
@@ -22,11 +20,13 @@ const ScheduleItem = ({
   setScheduleCount,
   schedules,
   setSchedules,
-  enableDeleteBtn,
 }) => {
+  /** useState */
   const [dayofWeek, setDayofWeek] = useState("");
   const [startTime, setStartTime] = useState("");
   const [endTime, setEndTime] = useState("");
+
+  const enableDeleteBtn = index > 0 && index === scheduleCount - 1;
 
   /**
    * @function removeScheduleCount
@@ -65,22 +65,29 @@ const ScheduleItem = ({
     setSchedules(updatedSchedules);
   };
 
+  /**
+   * @function resetStates
+   * @description ステートを全てリセットする
+   */
+  const resetStates = () => {
+    setDayofWeek("");
+    setStartTime("");
+    setEndTime("");
+  };
+
   useEffect(() => {
     if (!schedules.length) {
-      setDayofWeek("");
-      setStartTime("");
-      setEndTime("");
+      resetStates();
     }
   }, [schedules]);
 
   return (
     <tr>
-      <td className="p-2">
+      <td className="p-1 lg:p-2">
         <select
-          name="dayofweek"
-          className="w-full box-border leading-loose border-gray-200 border-solid border-2 px-3 h-[60px] text-base"
-          onChange={(e) => changeScheduleProps("dayofweek", e.target.value)}
-          defaultValue=""
+          name="dayofWeek"
+          className="w-full box-border leading-loose border-gray-200 border-solid border-2 p-1 lg:p-2 px-3 h-[38px] lg:h-[46px] text-base"
+          onChange={(e) => changeScheduleProps("dayofWeek", e.target.value)}
           value={dayofWeek}
         >
           <option value="" disabled>
@@ -97,30 +104,30 @@ const ScheduleItem = ({
           <option value="sun">日曜</option>
         </select>
       </td>
-      <td className="p-2">
+      <td className="p-1 lg:p-2">
         <input
           type="time"
           name="startTime"
           value={startTime}
           onChange={(e) => changeScheduleProps("startTime", e.target.value)}
-          className="w-full box-border border-gray-200 border-solid border-2 p-4 text-base"
+          className="w-full box-border border-gray-200 border-solid border-2 p-1 lg:p-2  text-base"
         />
       </td>
-      <td className="p-2">
+      <td className="p-1 lg:p-2">
         <input
           type="time"
           name="endTime"
           value={endTime}
           onChange={(e) => changeScheduleProps("endTime", e.target.value)}
-          className="w-full box-border border-gray-200 border-solid border-2 p-4 text-base"
+          className="w-full box-border border-gray-200 border-solid border-2 p-1 lg:p-2  text-base"
         />
       </td>
-      <td className="p-2">
+      <td className="p-1 lg:p-2">
         {enableDeleteBtn && (
           <button
             type="button"
             onClick={(e) => removeScheduleCount()}
-            className="box-border bg-white border-red-500 border-solid border-2 text-red-500  p-6 py-3 text-2xl"
+            className="box-border bg-white border-red-500 border-solid border-2 text-red-500 w-[38px] lg:w-[46px]  h-[38px] lg:h-[46px] text-2xl"
           >
             -
           </button>
