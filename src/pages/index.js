@@ -2,11 +2,13 @@ import { useState, useEffect } from "react";
 
 import Heading from "@/components/home/heading";
 import Input from "@/components/home/Input";
+import ScheduleHeading from "@/components/home/ScheduleHeading";
 import AddButton from "@/components/home/AddButton";
 import ScheduleItem from "@/components/home/ScheduleItem";
 
 export default function Home() {
   const [scheduleCount, setScheduleCount] = useState(1);
+  const [username, setUsername] = useState("");
 
   /**
    * @function submitSchedule
@@ -14,6 +16,9 @@ export default function Home() {
    */
   const submitSchedule = (e) => {
     e.preventDefault();
+
+    const json = [{ name: username, schedules: [] }];
+    localStorage.setItem(username, JSON.stringify(json));
   };
 
   return (
@@ -23,15 +28,9 @@ export default function Home() {
       <div>
         <Heading />
         <form className={`mt-8`}>
-          <Input />
+          <Input username={username} setUsername={setUsername} />
           <div>
-            <h2 htmlFor="username" className="text-lg font-bold">
-              もくもく会希望曜日・日時の入力
-            </h2>
-            <p>
-              もくもく会を希望する曜日・日時を以下から入力ください。
-              <span className="text-red-500 text-sm">※上限20個まで</span>
-            </p>
+            <ScheduleHeading />
 
             <table className="mb-4 -mx-2">
               <thead>
@@ -62,7 +61,7 @@ export default function Home() {
             <div className="text-center">
               <button
                 onClick={submitSchedule}
-                className="border-none p-4 px-4 w-80 bg-[#3ea8ff] text-white font-bold text-lg rounded-md"
+                className="cursor-pointer border-none p-4 px-4 w-80 bg-[#3ea8ff] text-white font-bold text-lg rounded-md"
               >
                 入力した日程で送信する
               </button>

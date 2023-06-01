@@ -1,8 +1,6 @@
 import { useState } from "react";
 
-const Input = () => {
-  const [username, setUsername] = useState("");
-
+const Input = ({ username, setUsername }) => {
   return (
     <div className="mb-10">
       <label htmlFor="username" className="block mb-2 font-bold text-lg">
