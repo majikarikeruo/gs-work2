@@ -32,7 +32,7 @@ export default function Home() {
           <div>
             <ScheduleHeading />
 
-            <table className="mb-4 -mx-2">
+            <table className="w-full mb-4 -mx-2">
               <thead>
                 <tr>
                   <th className="p-2 text-left">曜日（週末・平日）</th>
@@ -55,16 +55,18 @@ export default function Home() {
               scheduleCount={scheduleCount}
               setScheduleCount={setScheduleCount}
             />
-            <p className="mt-8">
-              あくまで、基本的に何曜日何時くらいがいいかという希望を入れていただければ大丈夫です！
-            </p>
-            <div className="text-center">
-              <button
-                onClick={submitSchedule}
-                className="cursor-pointer border-none p-4 px-4 w-80 bg-[#3ea8ff] text-white font-bold text-lg rounded-md"
-              >
-                入力した日程で送信する
-              </button>
+            <div className="mt-20">
+              <p>
+                あくまで、基本的に何曜日何時くらいがいいかという希望を入れていただければ大丈夫です！
+              </p>
+              <div className="text-center">
+                <button
+                  onClick={submitSchedule}
+                  className="cursor-pointer border-none p-4 px-4 w-80 bg-[#3ea8ff] text-white font-bold text-lg rounded-md"
+                >
+                  入力した日程で送信する
+                </button>
+              </div>
             </div>
           </div>
         </form>

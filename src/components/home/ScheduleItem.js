@@ -31,10 +31,16 @@ const ScheduleItem = ({ scheduleCount, setScheduleCount, enableDeleteBtn }) => {
         </select>
       </td>
       <td className="p-2">
-        <input className="box-border border-gray-200 border-solid border-2 p-4 text-base" />
+        <input
+          type="time"
+          className="w-full box-border border-gray-200 border-solid border-2 p-4 text-base"
+        />
       </td>
       <td className="p-2">
-        <input className="box-border border-gray-200 border-solid border-2 p-4 text-base" />
+        <input
+          type="time"
+          className="w-full box-border border-gray-200 border-solid border-2 p-4 text-base"
+        />
       </td>
       <td className="p-2">
         {enableDeleteBtn && (
