@@ -1,6 +1,16 @@
 import { useState } from "react";
 
-const ScheduleItem = ({ schedules }) => {
+const ScheduleItem = ({ scheduleCount, setScheduleCount, enableDeleteBtn }) => {
+  /**
+   * @function removeScheduleCount
+   * @description スケジュールの削除
+   */
+  const removeScheduleCount = () => {
+    if (scheduleCount === 1) return;
+
+    setScheduleCount(scheduleCount - 1);
+  };
+
   return (
     <tr>
       <td className="p-2">
@@ -27,12 +37,15 @@ const ScheduleItem = ({ schedules }) => {
         <input className="box-border border-gray-200 border-solid border-2 p-4 text-base" />
       </td>
       <td className="p-2">
-        <button
-          type="button"
-          className="box-border bg-white border-red-500 border-solid border-2 text-red-500  p-6 py-3 text-2xl"
-        >
-          -
-        </button>
+        {enableDeleteBtn && (
+          <button
+            type="button"
+            onClick={(e) => removeScheduleCount()}
+            className="box-border bg-white border-red-500 border-solid border-2 text-red-500  p-6 py-3 text-2xl"
+          >
+            -
+          </button>
+        )}
       </td>
     </tr>
   );
