@@ -8,14 +8,14 @@ const Result = () => {
   const [allSchedules, setAllSchedules] = useState([]);
   const [overlappingTimes, setOverlappingTimes] = useState([]);
 
-  const matchSchedules = () => {
+  const matchSchedules = (allScheduleData) => {
     const overlappingTimes = [];
 
     // データの総当たり実施
-    for (let i = 0; i < allSchedules.length; i++) {
-      const targetData = JSON.parse(allSchedules[i]);
-      for (let j = i + 1; j < allSchedules.length; j++) {
-        const counterData = JSON.parse(allSchedules[j]);
+    for (let i = 0; i < allScheduleData.length; i++) {
+      const targetData = JSON.parse(allScheduleData[i]);
+      for (let j = i + 1; j < allScheduleData.length; j++) {
+        const counterData = JSON.parse(allScheduleData[j]);
 
         if (
           targetData.schedules[0].dayofWeek ===
@@ -69,11 +69,11 @@ const Result = () => {
 
   useEffect(() => {
     const keys = Object.keys(localStorage);
-    const allSchedules = keys.map((key, index) => localStorage.getItem(key));
+    const allScheduleData = keys.map((key, index) => localStorage.getItem(key));
 
-    setAllSchedules([...allSchedules]);
-    if (allSchedules.length) {
-      matchSchedules();
+    if (allScheduleData.length) {
+      matchSchedules(allScheduleData);
+      setAllSchedules([...allSchedules]);
     }
   }, []);
 
