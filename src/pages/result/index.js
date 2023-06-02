@@ -1,13 +1,30 @@
+/**
+ * React
+ */
 import { useEffect, useState } from "react";
 
+/**
+ * Next
+ */
 import Image from "next/image";
 
+/**
+ * Components
+ */
 import Heading from "@/components/common/Heading";
 import LinkButton from "@/components/common/LinkButton";
 
 const Result = () => {
   const [allSchedules, setAllSchedules] = useState([]);
   const [overlappingTimes, setOverlappingTimes] = useState([]);
+
+  const getFormattedTime = (time) => {
+    return new Date(`2000-01-01T${time}`);
+  };
+
+  const getZeroPaddingTime = (time) => {
+    return time.toString().padStart(2, "0");
+  };
 
   const matchSchedules = (allScheduleData) => {
     const overlappingTimes = [];
@@ -22,23 +39,24 @@ const Result = () => {
           targetData.schedules[0].dayofWeek ===
           counterData.schedules[0].dayofWeek
         ) {
-          const targetStartTime = new Date(
-            `2000-01-01T${targetData.schedules[0].startTime}`
+          const targetStartTime = getFormattedTime(
+            targetData.schedules[0].startTime
           );
-          const targetEndTime = new Date(
-            `2000-01-01T${targetData.schedules[0].endTime}`
+          const targetEndTime = getFormattedTime(
+            targetData.schedules[0].endTime
           );
-          const counterStartTime = new Date(
-            `2000-01-01T${counterData.schedules[0].startTime}`
+          const counterStartTime = getFormattedTime(
+            counterData.schedules[0].startTime
           );
-          const counterEndTime = new Date(
-            `2000-01-01T${counterData.schedules[0].endTime}`
+          const counterEndTime = getFormattedTime(
+            counterData.schedules[0].endTime
           );
 
-          if (
+          const isTimeOverlap =
             targetStartTime <= counterEndTime &&
-            counterStartTime <= targetEndTime
-          ) {
+            counterStartTime <= targetEndTime;
+
+          if (isTimeOverlap) {
             const overlapStartTime = new Date(
               Math.max(targetStartTime, counterStartTime)
             );
@@ -46,14 +64,13 @@ const Result = () => {
               Math.min(targetEndTime, counterEndTime)
             );
 
-            const targetMinutes = overlapStartTime
-              .getMinutes()
-              .toString()
-              .padStart(2, "0");
-            const counterMinutes = overlapEndTime
-              .getMinutes()
-              .toString()
-              .padStart(2, "0");
+            const targetMinutes = getZeroPaddingTime(
+              overlapStartTime.getMinutes()
+            );
+
+            const counterMinutes = getZeroPaddingTime(
+              overlapEndTime.getMinutes()
+            );
 
             overlappingTimes.push({
               userName: [targetData.username, counterData.username],

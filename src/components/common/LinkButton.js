@@ -1,9 +1,12 @@
+import Link from "next/link";
+
 const LinkButton = ({ url, text }) => {
   return (
     <div className="mt-8">
-      <a href={url} className="no-underline text-[#0468bb]">
+      <Link href={url} className="no-underline text-[#0468bb]">
+        {" "}
         {text}
-      </a>
+      </Link>
     </div>
   );
 };
