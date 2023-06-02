@@ -42,7 +42,7 @@ export default function Home() {
       className={`flex min-h-screen flex-col items-center justify-between py-16 px-3`}
     >
       <div>
-        <Heading />
+        <Heading text={"もくもく会・マッチングアプリ"} />
         <form className={`mt-8`}>
           <Input username={username} setUsername={setUsername} />
           <div>

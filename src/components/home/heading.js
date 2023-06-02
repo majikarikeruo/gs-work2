@@ -1,7 +1,7 @@
-const Heading = () => {
+const Heading = ({ text }) => {
   return (
     <div>
-      <h1 className={`text-2xl font-bold`}>もくもく会・マッチングアプリ</h1>
+      <h1 className={`text-2xl font-bold`}>{text}</h1>
     </div>
   );
 };
