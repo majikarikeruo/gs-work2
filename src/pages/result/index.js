@@ -109,7 +109,7 @@ const Result = () => {
 
       if (overlappingUsers.length > currentSchedule.userName.length) {
         overlappingTimes.push({
-          userName: overlappingUsers,
+          userName: reduceDuplicateNames(overlappingUsers),
           dayofWeek: currentSchedule.dayofWeek,
           startTime: currentSchedule.startTime,
           endTime: currentSchedule.endTime,
@@ -117,6 +117,15 @@ const Result = () => {
       }
     }
     setOverlappingTimes(overlappingTimes);
+  };
+
+  const reduceDuplicateNames = (arr) => {
+    const initialValue = [];
+    const newArr = arr.reduce(
+      (acc, obj) => (acc.includes(obj) ? acc : [...acc, obj]),
+      initialValue
+    );
+    return newArr;
   };
 
   /**
