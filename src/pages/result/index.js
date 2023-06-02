@@ -18,71 +18,133 @@ const Result = () => {
   const [allSchedules, setAllSchedules] = useState([]);
   const [overlappingTimes, setOverlappingTimes] = useState([]);
 
-  const getFormattedTime = (time) => {
-    return new Date(`2000-01-01T${time}`);
+  /**
+   * @function getFormattedTime
+   * @description 時間を分単位に変換する
+   */
+  const getFormattedTime = (timeString) => {
+    const [hours, minutes] = timeString.split(":");
+    return parseInt(hours) * 60 + parseInt(minutes);
   };
 
+  /**
+   * @function getZeroPaddingTime
+   * @description 時間をゼロ埋めする
+   */
   const getZeroPaddingTime = (time) => {
     return time.toString().padStart(2, "0");
   };
 
+  /**
+   * @function matchSchedules
+   * @description スケジュールのマッチング
+   */
   const matchSchedules = (allScheduleData) => {
     const overlappingTimes = [];
 
-    // データの総当たり実施
     for (let i = 0; i < allScheduleData.length; i++) {
       const targetData = JSON.parse(allScheduleData[i]);
+
       for (let j = i + 1; j < allScheduleData.length; j++) {
         const counterData = JSON.parse(allScheduleData[j]);
 
-        if (
-          targetData.schedules[0].dayofWeek ===
-          counterData.schedules[0].dayofWeek
-        ) {
-          const targetStartTime = getFormattedTime(
-            targetData.schedules[0].startTime
-          );
-          const targetEndTime = getFormattedTime(
-            targetData.schedules[0].endTime
-          );
-          const counterStartTime = getFormattedTime(
-            counterData.schedules[0].startTime
-          );
-          const counterEndTime = getFormattedTime(
-            counterData.schedules[0].endTime
-          );
+        for (const targetSchedule of targetData.schedules) {
+          for (const counterSchedule of counterData.schedules) {
+            if (targetSchedule.dayofWeek === counterSchedule.dayofWeek) {
+              const overlapStartTime = Math.max(
+                getFormattedTime(targetSchedule.startTime),
+                getFormattedTime(counterSchedule.startTime)
+              );
+              const overlapEndTime = Math.min(
+                getFormattedTime(targetSchedule.endTime),
+                getFormattedTime(counterSchedule.endTime)
+              );
 
-          const isTimeOverlap =
-            targetStartTime <= counterEndTime &&
-            counterStartTime <= targetEndTime;
-
-          if (isTimeOverlap) {
-            const overlapStartTime = new Date(
-              Math.max(targetStartTime, counterStartTime)
-            );
-            const overlapEndTime = new Date(
-              Math.min(targetEndTime, counterEndTime)
-            );
-
-            const targetMinutes = getZeroPaddingTime(
-              overlapStartTime.getMinutes()
-            );
-
-            const counterMinutes = getZeroPaddingTime(
-              overlapEndTime.getMinutes()
-            );
-
-            overlappingTimes.push({
-              userName: [targetData.username, counterData.username],
-              dayofWeek: targetData.schedules[0].dayofWeek,
-              startTime: `${overlapStartTime.getHours()}:${targetMinutes}`,
-              endTime: `${overlapEndTime.getHours()}:${counterMinutes}`,
-            });
+              if (overlapStartTime < overlapEndTime) {
+                overlappingTimes.push({
+                  userName: [targetData.username, counterData.username],
+                  dayofWeek: targetSchedule.dayofWeek,
+                  startTime: formatTime(overlapStartTime),
+                  endTime: formatTime(overlapEndTime),
+                });
+              }
+            }
           }
         }
       }
     }
-    setOverlappingTimes([...overlappingTimes]);
+    const nonOverlappingTimes = removeDuplicateOverlaps(overlappingTimes);
+
+    refilterSchedules(nonOverlappingTimes);
+  };
+
+  /**
+   * @function refilterSchedules
+   * @description スケジュールを再フィルタリングする
+   */
+  const refilterSchedules = (schedules) => {
+    const overlappingTimes = [];
+    const processedIndexes = [];
+
+    for (let i = 0; i < schedules.length; i++) {
+      if (processedIndexes.includes(i)) {
+        continue;
+      }
+
+      const currentSchedule = schedules[i];
+      const overlappingUsers = [...currentSchedule.userName];
+
+      for (let j = i + 1; j < schedules.length; j++) {
+        const nextSchedule = schedules[j];
+
+        if (
+          currentSchedule.dayofWeek === nextSchedule.dayofWeek &&
+          currentSchedule.startTime < nextSchedule.endTime &&
+          currentSchedule.endTime > nextSchedule.startTime
+        ) {
+          overlappingUsers.push(...nextSchedule.userName);
+          processedIndexes.push(j);
+        }
+      }
+
+      if (overlappingUsers.length > currentSchedule.userName.length) {
+        overlappingTimes.push({
+          userName: overlappingUsers,
+          dayofWeek: currentSchedule.dayofWeek,
+          startTime: currentSchedule.startTime,
+          endTime: currentSchedule.endTime,
+        });
+      }
+    }
+    setOverlappingTimes(overlappingTimes);
+  };
+
+  /**
+   * @function removeDuplicateOverlaps
+   * @description 重複する時間帯を削除する
+   */
+  const removeDuplicateOverlaps = (overlappingTimes) => {
+    const uniqueOverlaps = [];
+    const seenTimeRanges = new Set();
+
+    for (const overlap of overlappingTimes) {
+      const timeRange = `${overlap.startTime}-${overlap.endTime}`;
+
+      if (!seenTimeRanges.has(timeRange)) {
+        uniqueOverlaps.push(overlap);
+        seenTimeRanges.add(timeRange);
+      }
+    }
+
+    return uniqueOverlaps;
+  };
+
+  const formatTime = (minutes) => {
+    const hours = Math.floor(minutes / 60);
+    const mins = minutes % 60;
+    return `${hours.toString().padStart(2, "0")}:${mins
+      .toString()
+      .padStart(2, "0")}`;
   };
 
   useEffect(() => {
