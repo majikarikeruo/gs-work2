@@ -2,7 +2,8 @@ import { useEffect, useState } from "react";
 
 import Image from "next/image";
 
-import Heading from "@/components/home/heading";
+import Heading from "@/components/common/Heading";
+import LinkButton from "@/components/common/LinkButton";
 
 const Result = () => {
   const [allSchedules, setAllSchedules] = useState([]);
@@ -122,11 +123,8 @@ const Result = () => {
             ))}
           </ul>
         </div>
-        <div className="mt-8 text-center">
-          <a href="/" className="no-underline text-[#0468bb]">
-            投票ページに戻る
-          </a>
-        </div>
+
+        <LinkButton url="/" text="投票ページに戻る" />
       </div>
     </main>
   );
