@@ -91,6 +91,12 @@ export default function Home() {
                 >
                   入力した日程で送信する
                 </button>
+
+                <div className="mt-8">
+                  <a href="/result" className="no-underline text-[#0468bb]">
+                    結果を見る
+                  </a>
+                </div>
               </div>
             </div>
           </div>

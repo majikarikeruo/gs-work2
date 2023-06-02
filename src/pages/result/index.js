@@ -122,6 +122,11 @@ const Result = () => {
             ))}
           </ul>
         </div>
+        <div className="mt-8 text-center">
+          <a href="/" className="no-underline text-[#0468bb]">
+            投票ページに戻る
+          </a>
+        </div>
       </div>
     </main>
   );
