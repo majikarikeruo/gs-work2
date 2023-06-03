@@ -18,73 +18,58 @@ const Result = () => {
   const [allSchedules, setAllSchedules] = useState([]);
   const [overlappingTimes, setOverlappingTimes] = useState([]);
 
-  /**
-   * @function getFormattedTime
-   * @description 時間を分単位に変換する
-   */
-  const getFormattedTime = (timeString) => {
-    const [hours, minutes] = timeString.split(":");
-    return parseInt(hours) * 60 + parseInt(minutes);
-  };
-
-  /**
-   * @function getZeroPaddingTime
-   * @description 時間をゼロ埋めする
-   */
-  const getZeroPaddingTime = (time) => {
-    return time.toString().padStart(2, "0");
-  };
-
-  /**
+  /*****************************************
    * @function matchSchedules
-   * @description スケジュールのマッチング
-   */
+   * @description 総あたりによるスケジュールのマッチング検索
+   *****************************************/
   const matchSchedules = (allScheduleData) => {
-    const overlappingTimes = [];
+    const overlappingAry = [];
 
     for (let i = 0; i < allScheduleData.length; i++) {
-      const targetData = JSON.parse(allScheduleData[i]);
+      const schedule1 = JSON.parse(allScheduleData[i]);
 
       for (let j = i + 1; j < allScheduleData.length; j++) {
-        const counterData = JSON.parse(allScheduleData[j]);
+        const schedule2 = JSON.parse(allScheduleData[j]);
 
-        for (const targetSchedule of targetData.schedules) {
-          for (const counterSchedule of counterData.schedules) {
-            if (targetSchedule.dayofWeek === counterSchedule.dayofWeek) {
-              const overlapStartTime = Math.max(
-                getFormattedTime(targetSchedule.startTime),
-                getFormattedTime(counterSchedule.startTime)
-              );
-              const overlapEndTime = Math.min(
-                getFormattedTime(targetSchedule.endTime),
-                getFormattedTime(counterSchedule.endTime)
-              );
+        for (const scheduleAItem of schedule1.schedules) {
+          for (const scheduleBItem of schedule2.schedules) {
+            if (scheduleAItem.dayofWeek === scheduleBItem.dayofWeek) {
+              const overlap = _findOverlap(scheduleAItem, scheduleBItem);
 
-              if (overlapStartTime < overlapEndTime) {
-                overlappingTimes.push({
-                  userName: [targetData.username, counterData.username],
-                  dayofWeek: targetSchedule.dayofWeek,
-                  startTime: formatTime(overlapStartTime),
-                  endTime: formatTime(overlapEndTime),
-                });
+              if (overlap) {
+                const overlappdedSchedule = {
+                  userName: [schedule1.username, schedule2.username],
+                  dayofWeek: scheduleAItem.dayofWeek,
+                  startTime: _convertMinutesToTimeString(overlap.startTime),
+                  endTime: _convertMinutesToTimeString(overlap.endTime),
+                };
+
+                overlappingAry.push(overlappdedSchedule);
               }
             }
           }
         }
       }
     }
-    const nonOverlappingTimes = removeDuplicateOverlaps(overlappingTimes);
 
-    refilterSchedules(nonOverlappingTimes);
+    /**重複スケジュールを削除する */
+    const slimOverlappingTimes = _removeDuplicateOverlaps(overlappingAry);
+
+    /** スケジュールデータ */
+    const overlappingTimes = refilterSchedules(slimOverlappingTimes);
+
+    setOverlappingTimes(overlappingTimes);
   };
 
-  /**
+  /*****************************************
    * @function refilterSchedules
    * @description スケジュールを再フィルタリングする
-   */
+   * @param {array} schedules - スケジュール
+   * @returns {array} 重複する時間帯
+   *****************************************/
   const refilterSchedules = (schedules) => {
-    const overlappingTimes = [];
-    const processedIndexes = [];
+    const overlappingTimes = []; // 重複する時間帯
+    const processedIndexes = []; // 処理済みのスケジュールデータのインデックス
 
     for (let i = 0; i < schedules.length; i++) {
       if (processedIndexes.includes(i)) {
@@ -109,30 +94,64 @@ const Result = () => {
 
       if (overlappingUsers.length > currentSchedule.userName.length) {
         overlappingTimes.push({
-          userName: reduceDuplicateNames(overlappingUsers),
+          userName: _reduceDuplicateNames(overlappingUsers),
           dayofWeek: currentSchedule.dayofWeek,
           startTime: currentSchedule.startTime,
           endTime: currentSchedule.endTime,
         });
       }
     }
-    setOverlappingTimes(overlappingTimes);
+
+    return overlappingTimes;
   };
 
-  const reduceDuplicateNames = (arr) => {
-    const initialValue = [];
-    const newArr = arr.reduce(
-      (acc, obj) => (acc.includes(obj) ? acc : [...acc, obj]),
-      initialValue
+  /*****************************************
+   * @function _findOverlap
+   * @description 重複する時間帯を探す
+   * @param {object} schedule1 - スケジュール1
+   * @param {object} schedule2 - スケジュール2
+   * @returns {object} 重複する時間帯。重複しない場合はnull
+   *****************************************/
+  const _findOverlap = (schedule1, schedule2) => {
+    const overlapStartTime = Math.max(
+      _getFormattedTime(schedule1.startTime),
+      _getFormattedTime(schedule2.startTime)
     );
-    return newArr;
+    const overlapEndTime = Math.min(
+      _getFormattedTime(schedule1.endTime),
+      _getFormattedTime(schedule2.endTime)
+    );
+
+    if (overlapStartTime < overlapEndTime) {
+      return { startTime: overlapStartTime, endTime: overlapEndTime };
+    }
+
+    return null;
   };
 
-  /**
-   * @function removeDuplicateOverlaps
+  /*****************************************
+   * @function _reduceDuplicateNames
+   * @description 重複する名前を削除する
+   *****************************************/
+  const _reduceDuplicateNames = (arr) => {
+    const uniqueNames = [...new Set(arr)];
+    return uniqueNames;
+  };
+
+  /*****************************************
+   * @function _getFormattedTime
+   * @description 時間を分単位に変換する
+   *****************************************/
+  const _getFormattedTime = (timeString) => {
+    const [hours, minutes] = timeString.split(":");
+    return parseInt(hours) * 60 + parseInt(minutes);
+  };
+
+  /*****************************************
+   * @function _removeDuplicateOverlaps
    * @description 重複する時間帯を削除する
-   */
-  const removeDuplicateOverlaps = (overlappingTimes) => {
+   *****************************************/
+  const _removeDuplicateOverlaps = (overlappingTimes) => {
     const uniqueOverlaps = [];
     const seenTimeRanges = new Set();
 
@@ -148,7 +167,11 @@ const Result = () => {
     return uniqueOverlaps;
   };
 
-  const formatTime = (minutes) => {
+  /*****************************************
+   * @function _convertMinutesToTimeString
+   * @description 分を時間の文字列に変換する
+   *****************************************/
+  const _convertMinutesToTimeString = (minutes) => {
     const hours = Math.floor(minutes / 60);
     const mins = minutes % 60;
     return `${hours.toString().padStart(2, "0")}:${mins
