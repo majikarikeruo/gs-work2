@@ -1,10 +1,10 @@
-const SubmitButton = ({ handleSubmit }) => {
+const SubmitButton = ({ handleSubmit, text }) => {
   return (
     <button
       onClick={handleSubmit}
-      className="cursor-pointer border-none p-4 px-4 w-80 bg-[#3ea8ff] text-white font-bold text-lg rounded-md"
+      className="cursor-pointer border-none p-4 px-4 w-full bg-[#f1c232] text-white font-bold text-lg rounded-md"
     >
-      入力した日程で送信する
+      {text}
     </button>
   );
 };
