@@ -17,7 +17,7 @@ const AddButton = ({ scheduleCount, setScheduleCount }) => {
     <div className="text-center">
       <button
         type="button"
-        className="w-[38px] lg:w-[46px] h-[38px] lg:h-[46px] border-none   bg-[#3ea8ff] text-white font-bold text-lg rounded-md"
+        className="w-[38px] lg:w-[46px] h-[38px] lg:h-[46px] border-none   bg-[#f1c232] text-white font-bold text-lg rounded-md"
         onClick={(e) => addScheduleCount()}
       >
         ＋

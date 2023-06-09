@@ -1,17 +1,23 @@
+/**
+ * React
+ */
 import { useState, useEffect } from "react";
+
+/**
+ * Library
+ */
+import { supabase } from "@/lib/supabase";
 
 /**
  *
  * Todo
- * 
+ *
  * -  集計ページの作成
  * - デザイン演出リッチに
- * 
- * 
- * 
- * 
-
-
+ *
+ *
+ *
+ *
  */
 
 const ScheduleItem = ({
