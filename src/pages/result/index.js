@@ -19,14 +19,15 @@ import ResultItem from "@/components/result/ResultItem";
 
 const Result = () => {
   const [allSchedules, setAllSchedules] = useState([]);
-  const [overlappingTimes, setOverlappingTimes] = useState([]);
 
   /*****************************************
    * @function getAllData
    * @description
    *****************************************/
   const getAllData = async () => {
-    const { data, error } = await supabase.from("schedules").select();
+    const { data, error } = await supabase
+      .from("schedules")
+      .select("startTime, endTime, dayofWeek, profiles (user_name)");
 
     return data;
   };
@@ -38,13 +39,16 @@ const Result = () => {
   const matchSchedules = (allScheduleData) => {};
 
   useEffect(() => {
-    const keys = Object.keys(localStorage);
-    const allScheduleData = getAllData();
+    const fetchData = async () => {
+      const allScheduleData = await getAllData();
 
-    if (allScheduleData.length) {
-      matchSchedules(allScheduleData);
-      setAllSchedules([...allSchedules]);
-    }
+      if (allScheduleData.length) {
+        matchSchedules(allScheduleData);
+        setAllSchedules([...allScheduleData]);
+      }
+    };
+
+    fetchData();
   }, []);
 
   return (
@@ -54,11 +58,11 @@ const Result = () => {
       <div className="w-full max-w-2xl p-10 bg-white shadow-xl rounded-2xl">
         <Heading text={"Matching Result"} />
         <UserRequestTime />
-        <ResultsInfo />
+        <ResultsInfo count={allSchedules.length} />
 
         <div className="p-0 border-t-2 border-gray-200 border-solid border-b-0 border-l-0 border-r-0">
-          {[...Array(3)].map((index) => (
-            <ResultItem />
+          {allSchedules.map((schedule, index) => (
+            <ResultItem schedule={schedule} key={index} />
           ))}
         </div>
 

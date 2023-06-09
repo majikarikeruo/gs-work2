@@ -32,7 +32,7 @@ export default function vote() {
     const {
       data: { session },
     } = await supabase.auth.getSession();
-    console.log(session);
+
     if (!session) {
       alert("ログインしてください");
       router.replace("/login");
@@ -55,15 +55,11 @@ export default function vote() {
         { onConflict: "user_id" }
       )
       .select();
-    console.log(userData);
 
-    const schedulesObj = schedules.map((item, index) => {
-      const obj = {
-        user_id: userData[0].id,
-        ...item,
-      };
-      return obj;
-    });
+    const schedulesObj = schedules.map((item) => ({
+      user_id: userData[0].id,
+      ...item,
+    }));
 
     const { data: scheduleData, error: scheduleError } = await supabase
       .from("schedules")

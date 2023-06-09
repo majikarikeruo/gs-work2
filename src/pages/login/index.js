@@ -35,7 +35,6 @@ export default function Login() {
         email: email,
         password: password,
       });
-      console.log(data, session, error);
 
       if (error) {
         alert(error.message);
