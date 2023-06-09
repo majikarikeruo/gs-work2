@@ -21,7 +21,7 @@ import SubmitButton from "@/components/home/SubmitButton";
 import ScheduleItem from "@/components/home/ScheduleItem";
 import LinkButton from "@/components/common/LinkButton";
 
-export default function vote() {
+export default function Vote() {
   const [scheduleCount, setScheduleCount] = useState(1);
   const [userInfo, setUserInfo] = useState(null);
   const [username, setUsername] = useState("");

@@ -26,7 +26,7 @@ const Message = () => {
         <div className="mb-10">こすげさん・たつやさん・こすげさん</div>
         <div className="p-0 border-t-2 ">
           {[...Array(5)].map((index) => (
-            <MessageBox />
+            <MessageBox key={index} />
           ))}
         </div>
         <div className="mt-10 text-center">
