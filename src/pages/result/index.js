@@ -23,17 +23,24 @@ import LogoutBtn from "@/components/common/LogoutBtn";
 
 const Result = () => {
   const [allSchedules, setAllSchedules] = useState([]);
+  const [userRequestTimes, setUserRequestTimes] = useState([]);
   const router = useRouter();
   const supabaseClient = useSupabaseClient();
 
+  /******************************
+   * @function doLogout
+   * @description ログアウト処理
+   ******************************/
   const doLogout = async () => {
-    // supabaseに用意されているログアウトの関数
-    const { error } = await supabaseClient.auth.signOut();
-    if (error) throw new Error(error.message);
-    // ログアウトを反映させるためにリロードさせる
-    router.replace("/login");
-  };
+    try {
+      const { error } = await supabaseClient.auth.signOut();
+      if (error) throw error;
 
+      router.replace("/login");
+    } catch (error) {
+      alert(error.message);
+    }
+  };
   /*****************************************
    * @function getAllData
    * @description
@@ -41,24 +48,34 @@ const Result = () => {
   const getAllData = async () => {
     const { data, error } = await supabase
       .from("schedules")
-      .select("startTime, endTime, dayofWeek,profiles: user_id ( user_name )");
-    console.log(data, 11111);
+      .select(
+        "startTime, endTime, dayofWeek,profiles: user_id ( user_name,user_id )"
+      );
     return data;
   };
 
   /*****************************************
-   * @function matchSchedules
-   * @description 総あたりによるスケジュールのマッチング検索
+   * @function getUserRequestTime
+   * @description ユーザーのリクエスト時間を取得
    *****************************************/
-  const matchSchedules = (allScheduleData) => {};
+  const getUserRequestTime = async (allScheduleData) => {
+    const {
+      data: { user },
+    } = await supabaseClient.auth.getUser();
+
+    const userRequestTime = allScheduleData.filter(
+      (item) => item.profiles.user_id === user.id
+    );
+    setUserRequestTimes(userRequestTime);
+  };
 
   useEffect(() => {
     const fetchData = async () => {
       const allScheduleData = await getAllData();
 
       if (allScheduleData.length) {
-        matchSchedules(allScheduleData);
         setAllSchedules([...allScheduleData]);
+        getUserRequestTime(allScheduleData);
       }
     };
 
@@ -73,7 +90,7 @@ const Result = () => {
 
       <div className="w-full max-w-2xl p-10 bg-white shadow-xl rounded-2xl">
         <Heading text={"Matching Result"} />
-        <UserRequestTime />
+        <UserRequestTime userRequestTimes={userRequestTimes} />
         <ResultsInfo count={allSchedules.length} />
 
         <div className="p-0 border-t-2 border-gray-200 border-solid border-b-0 border-l-0 border-r-0">

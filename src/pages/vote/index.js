@@ -32,16 +32,10 @@ export default function Vote({ user }) {
   const router = useRouter();
   const supabaseClient = useSupabaseClient();
 
-  /**
-   *
-   */
-
-  const doLogout = async () => {
-    const { data, error } = await supabaseClient.auth.signOut();
-    if (error) throw new Error(error.message);
-    router.replace("/login");
-  };
-
+  /******************************
+   * @function getSession
+   * @description ログインユーザーセッション情報取得
+   ******************************/
   const getSession = async () => {
     const {
       data: { session },
@@ -50,41 +44,63 @@ export default function Vote({ user }) {
     setUserInfo(session.user);
   };
 
+  /******************************
+   * @function doLogout
+   * @description ログアウト処理
+   ******************************/
+  const doLogout = async () => {
+    try {
+      const { error } = await supabaseClient.auth.signOut();
+      if (error) throw error;
+
+      router.replace("/login");
+    } catch (error) {
+      alert(error.message);
+    }
+  };
+
+  /***************************************************
+   * @function upsertData
+   * @description スケジュール送信ボタン押下時の処理
+   ***************************************************/
+  const upsertData = async (table, data, onConflict) => {
+    const { data: result, error } = await supabase
+      .from(table)
+      .upsert(data, { onConflict })
+      .select();
+    if (error) {
+      throw new Error(error.message);
+    }
+    return result;
+  };
+
   /***************************************************
    * @function submitSchedule
    * @description スケジュール送信ボタン押下時の処理
    ***************************************************/
   const submitSchedule = async (e) => {
     e.preventDefault();
-    const { data: userData, error: userError } = await supabase
-      .from("profiles")
-      .upsert(
+    try {
+      const userData = await upsertData(
+        "profiles",
         { user_id: userInfo.id, user_name: username },
-        { onConflict: "user_id" }
-      )
-      .select()
-      .eq("user_id", userInfo.id);
-    console.log(userData, "userData");
-    const schedulesObj = schedules.map((item) => ({
-      user_id: userData[0].id,
-      ...item,
-    }));
+        "user_id"
+      );
 
-    const { data: scheduleData, error: scheduleError } = await supabase
-      .from("schedules")
-      .upsert(schedulesObj)
-      .select();
+      const schedulesObj = schedules.map((item) => ({
+        user_id: userData[0].id,
+        ...item,
+      }));
 
-    /** validate */
-    if (userError || scheduleError) {
+      await upsertData("schedules", schedulesObj);
+
+      alert("入力したスケジュールを送信しました！");
+      resetScheduleState();
+    } catch (error) {
       alert(
         "スケジュールの登録に失敗しました。入力内容を再度ご確認いただくか、しばらく経ってから再度登録し直してください。"
       );
-      return;
     }
-
-    alert("入力したスケジュールを送信しました！");
-    resetScheduleState();
   };
 
   /****************************************************
