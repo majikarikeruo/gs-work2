@@ -31,6 +31,27 @@ const Result = () => {
   const supabaseClient = useSupabaseClient();
 
   /******************************
+   * @function handleScheduleChange
+   * @description スケジュール変更時の処理
+   ******************************/
+
+  const handleScheduleChange = async (e) => {
+    const [dayofWeek, startTime, endTime] = e.target.value.split(" ");
+    console.log(e.target.value, "e.target.value");
+    const {
+      data: { schedule },
+    } = await supabase
+      .from("schedules")
+      .select(
+        "startTime, endTime, dayofWeek,profiles: user_id ( user_name,user_id )"
+      )
+      .lt("startTime", endTime)
+      .gt("endTime", startTime);
+
+    console.log(schedule);
+  };
+
+  /******************************
    * @function doLogout
    * @description ログアウト処理
    ******************************/
@@ -98,7 +119,10 @@ const Result = () => {
 
       <div className="w-full max-w-2xl p-10 bg-white shadow-xl rounded-2xl">
         <Heading text={"Matching Result"} />
-        <UserRequestTime userRequestTimes={userRequestTimes} />
+        <UserRequestTime
+          userRequestTimes={userRequestTimes}
+          handleScheduleChange={handleScheduleChange}
+        />
         <ResultsInfo count={allSchedules.length} />
 
         <div className="p-0 border-t-2 border-gray-200 border-solid border-b-0 border-l-0 border-r-0">
