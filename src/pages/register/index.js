@@ -3,13 +3,13 @@
  */
 import { useState, useEffect } from "react";
 import Link from "next/link";
-import { useRouter } from "next/router";
+import { useRouter } from "next/navigation";
 
 /**
  * Library
  */
-import { supabase } from "@/lib/supabase";
-
+import { useSupabaseClient, useUser } from "@supabase/auth-helpers-react";
+import { createPagesServerClient } from "@supabase/auth-helpers-nextjs";
 /**
  * Components
  */
@@ -24,6 +24,7 @@ export default function Register() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const router = useRouter();
+  const supabaseClient = useSupabaseClient();
 
   /**
    * @function handleSubmit
@@ -32,7 +33,7 @@ export default function Register() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const { data, session, error } = await supabase.auth.signUp({
+      const { data, session, error } = await supabaseClient.auth.signUp({
         email: email,
         password: password,
       });
@@ -43,8 +44,7 @@ export default function Register() {
         return;
       }
 
-      alert("登録が完了しました。");
-      router.replace("/vote"); // ここでリダイレクト
+      alert("登録頂いたメールアドレスに確認メールを送信しました。");
     } catch (error) {
       alert(error);
     }
@@ -80,3 +80,20 @@ export default function Register() {
     </main>
   );
 }
+
+export const getServerSideProps = async (ctx) => {
+  const supabase = createPagesServerClient(ctx);
+  const {
+    data: { session },
+  } = await supabase.auth.getSession();
+  if (session)
+    return {
+      redirect: {
+        destination: "/vote",
+        permanent: false,
+      },
+    };
+  return {
+    props: {},
+  };
+};

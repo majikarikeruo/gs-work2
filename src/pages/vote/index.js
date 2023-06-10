@@ -8,6 +8,8 @@ import { useRouter } from "next/router";
  * Library
  */
 import { supabase } from "@/lib/supabase";
+import { useSupabaseClient, useUser } from "@supabase/auth-helpers-react";
+import { createPagesServerClient } from "@supabase/auth-helpers-nextjs";
 
 /**
  * Components
@@ -20,24 +22,30 @@ import AddButton from "@/components/home/AddButton";
 import SubmitButton from "@/components/home/SubmitButton";
 import ScheduleItem from "@/components/home/ScheduleItem";
 import LinkButton from "@/components/common/LinkButton";
+import LogoutBtn from "@/components/common/LogoutBtn";
 
-export default function Vote() {
+export default function Vote({ user }) {
   const [scheduleCount, setScheduleCount] = useState(1);
   const [userInfo, setUserInfo] = useState(null);
   const [username, setUsername] = useState("");
   const [schedules, setSchedules] = useState([]);
   const router = useRouter();
+  const supabaseClient = useSupabaseClient();
+
+  /**
+   *
+   */
+
+  const doLogout = async () => {
+    const { data, error } = await supabaseClient.auth.signOut();
+    if (error) throw new Error(error.message);
+    router.replace("/login");
+  };
 
   const getSession = async () => {
     const {
       data: { session },
-    } = await supabase.auth.getSession();
-
-    if (!session) {
-      alert("ログインしてください");
-      router.replace("/login");
-      return;
-    }
+    } = await supabaseClient.auth.getSession();
 
     setUserInfo(session.user);
   };
@@ -54,8 +62,9 @@ export default function Vote() {
         { user_id: userInfo.id, user_name: username },
         { onConflict: "user_id" }
       )
-      .select();
-
+      .select()
+      .eq("user_id", userInfo.id);
+    console.log(userData, "userData");
     const schedulesObj = schedules.map((item) => ({
       user_id: userData[0].id,
       ...item,
@@ -96,62 +105,80 @@ export default function Vote() {
     <main
       className={`flex min-h-screen flex-col items-center justify-center py-16 px-3 bg-[#f1c232]`}
     >
-      {userInfo && (
-        <div className="w-full max-w-xl p-10 bg-white shadow-xl  rounded-2xl">
-          <Heading text={"Mokumoku Matching"} />
+      <LogoutBtn doLogout={doLogout} />
+      <div className="w-full max-w-xl p-10 bg-white shadow-xl  rounded-2xl">
+        <Heading text={"Mokumoku Matching"} />
 
-          <form className="mt-8">
-            <div className="mb-10">
-              <Label text="LINE上でのお名前" />
-              <Input data={username} handle={setUsername} />
-            </div>
-            <div className="mb-10">
-              <Label text="もくもく会希望曜日・日時の入力" />
-              <span className="text-red-500 text-sm">※上限20個まで</span>
-              <Text text="もくもく会を希望する曜日・日時を以下から入力ください。" />
+        <form className="mt-8">
+          <div className="mb-10">
+            <Label text="LINE上でのお名前" />
+            <Input data={username} handle={setUsername} />
+          </div>
+          <div className="mb-10">
+            <Label text="もくもく会希望曜日・日時の入力" />
+            <span className="text-red-500 text-sm">※上限5個まで</span>
+            <Text text="もくもく会を希望する曜日・日時を以下から入力ください。" />
 
-              <table className="w-full mb-4 -mx-2">
-                <thead>
-                  <tr>
-                    <th className="p-2 text-left align-top">
-                      曜日
-                      <br className="lg:hidden" />
-                      <span className="text-[10px] lg:text-base">
-                        （週末・平日）
-                      </span>
-                    </th>
-                    <th className="p-2 text-left align-top">開始時間</th>
-                    <th className="p-2 text-left align-top">終了時間</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {[...Array(scheduleCount)].map((schedule, index) => (
-                    <ScheduleItem
-                      key={index}
-                      index={index}
-                      scheduleCount={scheduleCount}
-                      setScheduleCount={setScheduleCount}
-                      schedules={schedules}
-                      setSchedules={setSchedules}
-                    />
-                  ))}
-                </tbody>
-              </table>
+            <table className="w-full mb-4 -mx-2">
+              <thead>
+                <tr>
+                  <th className="p-2 text-left align-top">
+                    曜日
+                    <br className="lg:hidden" />
+                    <span className="text-[10px] lg:text-base">
+                      （週末・平日）
+                    </span>
+                  </th>
+                  <th className="p-2 text-left align-top">開始時間</th>
+                  <th className="p-2 text-left align-top">終了時間</th>
+                </tr>
+              </thead>
+              <tbody>
+                {[...Array(scheduleCount)].map((schedule, index) => (
+                  <ScheduleItem
+                    key={index}
+                    index={index}
+                    scheduleCount={scheduleCount}
+                    setScheduleCount={setScheduleCount}
+                    schedules={schedules}
+                    setSchedules={setSchedules}
+                  />
+                ))}
+              </tbody>
+            </table>
 
-              <AddButton
-                scheduleCount={scheduleCount}
-                setScheduleCount={setScheduleCount}
-              />
-            </div>
+            <AddButton
+              scheduleCount={scheduleCount}
+              setScheduleCount={setScheduleCount}
+            />
+          </div>
 
-            <div className="mt-20 text-center">
-              <Text text="あくまで、基本的に何曜日何時くらいがいいかという希望を入れていただければ大丈夫です！" />
-              <SubmitButton text="日程登録" handleSubmit={submitSchedule} />
-              <LinkButton url="/result" text="結果を見る" />
-            </div>
-          </form>
-        </div>
-      )}
+          <div className="mt-20 text-center">
+            <Text text="あくまで、基本的に何曜日何時くらいがいいかという希望を入れていただければ大丈夫です！" />
+            <SubmitButton text="日程登録" handleSubmit={submitSchedule} />
+            <LinkButton url="/result" text="結果を見る" />
+          </div>
+        </form>
+      </div>
     </main>
   );
 }
+
+export const getServerSideProps = async (ctx) => {
+  const supabase = createPagesServerClient(ctx);
+  const {
+    data: { session },
+  } = await supabase.auth.getSession();
+
+  console.log("session", session);
+  if (!session)
+    return {
+      redirect: {
+        destination: "/login",
+        permanent: false,
+      },
+    };
+  return {
+    props: {},
+  };
+};

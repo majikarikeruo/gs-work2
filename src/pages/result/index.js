@@ -2,11 +2,14 @@
  * React
  */
 import { useEffect, useState } from "react";
+import { useRouter } from "next/router";
 
 /**
  * Library
  */
 import { supabase } from "@/lib/supabase";
+import { useSupabaseClient, useUser } from "@supabase/auth-helpers-react";
+import { createPagesServerClient } from "@supabase/auth-helpers-nextjs";
 
 /**
  * Components
@@ -16,9 +19,20 @@ import LinkButton from "@/components/common/LinkButton";
 import ResultsInfo from "@/components/result/ResultsInfo";
 import UserRequestTime from "@/components/result/UserRequestTime";
 import ResultItem from "@/components/result/ResultItem";
+import LogoutBtn from "@/components/common/LogoutBtn";
 
 const Result = () => {
   const [allSchedules, setAllSchedules] = useState([]);
+  const router = useRouter();
+  const supabaseClient = useSupabaseClient();
+
+  const doLogout = async () => {
+    // supabaseに用意されているログアウトの関数
+    const { error } = await supabaseClient.auth.signOut();
+    if (error) throw new Error(error.message);
+    // ログアウトを反映させるためにリロードさせる
+    router.replace("/login");
+  };
 
   /*****************************************
    * @function getAllData
@@ -27,8 +41,8 @@ const Result = () => {
   const getAllData = async () => {
     const { data, error } = await supabase
       .from("schedules")
-      .select("startTime, endTime, dayofWeek, profiles (user_name)");
-
+      .select("startTime, endTime, dayofWeek,profiles: user_id ( user_name )");
+    console.log(data, 11111);
     return data;
   };
 
@@ -55,6 +69,8 @@ const Result = () => {
     <main
       className={`flex min-h-screen flex-col items-center justify-center py-16 px-3 bg-[#f1c232]`}
     >
+      <LogoutBtn doLogout={doLogout} />
+
       <div className="w-full max-w-2xl p-10 bg-white shadow-xl rounded-2xl">
         <Heading text={"Matching Result"} />
         <UserRequestTime />
@@ -73,3 +89,20 @@ const Result = () => {
 };
 
 export default Result;
+
+export const getServerSideProps = async (ctx) => {
+  const supabase = createPagesServerClient(ctx);
+  const {
+    data: { session },
+  } = await supabase.auth.getSession();
+  if (!session)
+    return {
+      redirect: {
+        destination: "/login",
+        permanent: false,
+      },
+    };
+  return {
+    props: {},
+  };
+};

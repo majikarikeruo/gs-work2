@@ -1,25 +1,30 @@
 /**
- * React
- */
-import { useState, useEffect } from "react";
-
-/**
  * Library
  */
-import { supabase } from "@/lib/supabase";
-
-/**
- * Components
- */
-import Heading from "@/components/common/Heading";
-import Label from "@/components/common/Label";
-import Input from "@/components/common/Input";
-import Text from "@/components/common/Text";
-import AddButton from "@/components/home/AddButton";
-import SubmitButton from "@/components/home/SubmitButton";
-import ScheduleItem from "@/components/home/ScheduleItem";
-import LinkButton from "@/components/common/LinkButton";
+import { createPagesServerClient } from "@supabase/auth-helpers-nextjs";
 
 export default function Home() {
-  return <div>トップページでーす</div>;
+  return (
+    <div className="h-full w-full min-h-screen place-content-center pt-32">
+      <p>トップページでーす</p>
+      Link to <a href="/login">Login</a>
+    </div>
+  );
 }
+
+export const getServerSideProps = async (ctx) => {
+  const supabase = createPagesServerClient(ctx);
+  const {
+    data: { session },
+  } = await supabase.auth.getSession();
+  if (session)
+    return {
+      redirect: {
+        destination: "/vote",
+        permanent: false,
+      },
+    };
+  return {
+    props: {},
+  };
+};
