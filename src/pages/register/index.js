@@ -18,7 +18,7 @@ import Label from "@/components/common/Label";
 import Input from "@/components/common/Input";
 import PasswordInput from "@/components/common/PasswordInput";
 
-import SubmitButton from "@/components/home/SubmitButton";
+import SubmitButton from "@/components/vote/SubmitButton";
 
 export default function Register() {
   const [email, setEmail] = useState("");

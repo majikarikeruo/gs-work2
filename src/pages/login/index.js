@@ -18,7 +18,7 @@ import Heading from "@/components/common/Heading";
 import Label from "@/components/common/Label";
 import Input from "@/components/common/Input";
 import PasswordInput from "@/components/common/PasswordInput";
-import SubmitButton from "@/components/home/SubmitButton";
+import SubmitButton from "@/components/vote/SubmitButton";
 
 export default function Login() {
   const [email, setEmail] = useState("");
@@ -92,7 +92,7 @@ export const getServerSideProps = async (ctx) => {
   const {
     data: { session },
   } = await supabase.auth.getSession();
-  console.log(session, "セッションあるよ");
+
   if (session)
     return {
       redirect: {

@@ -23,8 +23,8 @@ import LogoutBtn from "@/components/common/LogoutBtn";
 
 const Result = () => {
   /** useState */
-  const [allSchedules, setAllSchedules] = useState([]);
-  const [userRequestTimes, setUserRequestTimes] = useState([]);
+  const [mySchedules, setMySchedules] = useState([]);
+  const [otherSchedules, setOtherSchedules] = useState([]);
 
   /** library */
   const router = useRouter();
@@ -36,19 +36,19 @@ const Result = () => {
    ******************************/
 
   const handleScheduleChange = async (e) => {
-    const [dayofWeek, startTime, endTime] = e.target.value.split(" ");
-    console.log(e.target.value, "e.target.value");
-    const {
-      data: { schedule },
-    } = await supabase
+    console.log(e.target.value);
+    const [dayofWeek, startTime, endTime, id] = e.target.value.split(" ");
+
+    const { data: schedule } = await supabase
       .from("schedules")
       .select(
-        "startTime, endTime, dayofWeek,profiles: user_id ( user_name,user_id )"
+        "startTime, endTime, dayofWeek, profiles: user_id ( user_name,id )"
       )
-      .lt("startTime", endTime)
-      .gt("endTime", startTime);
+      .eq("dayofWeek", dayofWeek)
+      .neq("user_id", id);
 
-    console.log(schedule);
+    console.log(schedule, id);
+    setOtherSchedules(schedule || []);
   };
 
   /******************************
@@ -66,46 +66,45 @@ const Result = () => {
     }
   };
   /*****************************************
-   * @function fetchAllSchedules
-   * @description
+   * @function fetchSchedules
+   * @description スケジュールを取得
    *****************************************/
-  const fetchAllSchedules = async () => {
+  const fetchSchedules = async () => {
     const { data: schedules, error } = await supabase
       .from("schedules")
       .select(
-        "startTime, endTime, dayofWeek,profiles: user_id ( user_name,user_id )"
+        "startTime, endTime, dayofWeek,profiles: user_id ( user_name,id,user_id )"
       );
+
+    console.log(schedules);
     if (error) {
-      console.error("Failed to fetch schedules:", error);
       return [];
     }
 
     return schedules;
   };
 
-  /*****************************************
-   * @function fetchUserRequestedSchedules
-   * @description ユーザーのリクエスト時間を取得
-   *****************************************/
-  const fetchUserRequestedSchedules = async (allSchedules) => {
-    const {
-      data: { user },
-    } = await supabaseClient.auth.getUser();
-
-    const userRequestTime = allSchedules.filter(
-      (item) => item.profiles.user_id === user.id
-    );
-    setUserRequestTimes(userRequestTime);
-  };
-
   useEffect(() => {
     const fetchData = async () => {
-      const allScheduleData = await fetchAllSchedules();
+      const {
+        data: { user },
+      } = await supabaseClient.auth.getUser();
+      const allSchedules = await fetchSchedules();
 
-      if (allScheduleData.length) {
-        setAllSchedules([...allScheduleData]);
-        fetchUserRequestedSchedules(allScheduleData);
+      const mySchedules = allSchedules.filter(
+        ({ profiles: { user_id } }) => user_id === user.id
+      );
+      const otherSchedules = allSchedules.filter(
+        ({ profiles: { user_id } }) => user_id !== user.id
+      );
+      console.log(mySchedules, "mySchedules");
+      console.log(otherSchedules, "otherSchedules");
+
+      if (!allSchedules.length) {
+        return false;
       }
+      setMySchedules(mySchedules || []);
+      setOtherSchedules(otherSchedules || []);
     };
 
     fetchData();
@@ -120,13 +119,13 @@ const Result = () => {
       <div className="w-full max-w-2xl p-10 bg-white shadow-xl rounded-2xl">
         <Heading text={"Matching Result"} />
         <UserRequestTime
-          userRequestTimes={userRequestTimes}
-          handleScheduleChange={handleScheduleChange}
+          mySchedules={mySchedules}
+          handleChange={handleScheduleChange}
         />
-        <ResultsInfo count={allSchedules.length} />
+        <ResultsInfo count={otherSchedules.length} />
 
         <div className="p-0 border-t-2 border-gray-200 border-solid border-b-0 border-l-0 border-r-0">
-          {allSchedules.map((schedule, index) => (
+          {otherSchedules.map((schedule, index) => (
             <ResultItem schedule={schedule} key={index} />
           ))}
         </div>

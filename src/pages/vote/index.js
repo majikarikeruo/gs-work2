@@ -18,9 +18,9 @@ import Heading from "@/components/common/Heading";
 import Label from "@/components/common/Label";
 import Input from "@/components/common/Input";
 import Text from "@/components/common/Text";
-import AddButton from "@/components/home/AddButton";
-import SubmitButton from "@/components/home/SubmitButton";
-import ScheduleItem from "@/components/home/ScheduleItem";
+import AddButton from "@/components/vote/AddButton";
+import SubmitButton from "@/components/vote/SubmitButton";
+import ScheduleItem from "@/components/vote/ScheduleItem";
 import LinkButton from "@/components/common/LinkButton";
 import LogoutBtn from "@/components/common/LogoutBtn";
 
@@ -186,7 +186,6 @@ export const getServerSideProps = async (ctx) => {
     data: { session },
   } = await supabase.auth.getSession();
 
-  console.log("session", session);
   if (!session)
     return {
       redirect: {
