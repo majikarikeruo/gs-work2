@@ -1,7 +1,7 @@
 import { useState } from "react";
 
 const AddButton = ({ scheduleCount, setScheduleCount }) => {
-  const maximumScheduleCount = 20;
+  const maximumScheduleCount = 5;
 
   /**
    * @function addScheduleCount

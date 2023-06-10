@@ -113,6 +113,7 @@ const ScheduleItem = ({
       <td className="p-1 lg:p-2">
         <input
           type="time"
+          step={1800}
           name="startTime"
           value={startTime}
           onChange={(e) => changeScheduleProps("startTime", e.target.value)}
@@ -122,6 +123,7 @@ const ScheduleItem = ({
       <td className="p-1 lg:p-2">
         <input
           type="time"
+          step={1800}
           name="endTime"
           value={endTime}
           onChange={(e) => changeScheduleProps("endTime", e.target.value)}

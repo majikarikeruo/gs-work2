@@ -2,11 +2,14 @@
  * React
  */
 import { useEffect, useState } from "react";
+import { useRouter } from "next/router";
 
 /**
  * Library
  */
 import { supabase } from "@/lib/supabase";
+import { useSupabaseClient, useUser } from "@supabase/auth-helpers-react";
+import { createPagesServerClient } from "@supabase/auth-helpers-nextjs";
 
 /**
  * Components
@@ -16,35 +19,92 @@ import LinkButton from "@/components/common/LinkButton";
 import ResultsInfo from "@/components/result/ResultsInfo";
 import UserRequestTime from "@/components/result/UserRequestTime";
 import ResultItem from "@/components/result/ResultItem";
+import LogoutBtn from "@/components/common/LogoutBtn";
 
 const Result = () => {
+  /** useState */
   const [allSchedules, setAllSchedules] = useState([]);
+  const [userRequestTimes, setUserRequestTimes] = useState([]);
 
+  /** library */
+  const router = useRouter();
+  const supabaseClient = useSupabaseClient();
+
+  /******************************
+   * @function handleScheduleChange
+   * @description スケジュール変更時の処理
+   ******************************/
+
+  const handleScheduleChange = async (e) => {
+    const [dayofWeek, startTime, endTime] = e.target.value.split(" ");
+    console.log(e.target.value, "e.target.value");
+    const {
+      data: { schedule },
+    } = await supabase
+      .from("schedules")
+      .select(
+        "startTime, endTime, dayofWeek,profiles: user_id ( user_name,user_id )"
+      )
+      .lt("startTime", endTime)
+      .gt("endTime", startTime);
+
+    console.log(schedule);
+  };
+
+  /******************************
+   * @function doLogout
+   * @description ログアウト処理
+   ******************************/
+  const doLogout = async () => {
+    try {
+      const { error } = await supabaseClient.auth.signOut();
+      if (error) throw error;
+
+      router.replace("/login");
+    } catch (error) {
+      alert(error.message);
+    }
+  };
   /*****************************************
-   * @function getAllData
+   * @function fetchAllSchedules
    * @description
    *****************************************/
-  const getAllData = async () => {
-    const { data, error } = await supabase
+  const fetchAllSchedules = async () => {
+    const { data: schedules, error } = await supabase
       .from("schedules")
-      .select("startTime, endTime, dayofWeek, profiles (user_name)");
+      .select(
+        "startTime, endTime, dayofWeek,profiles: user_id ( user_name,user_id )"
+      );
+    if (error) {
+      console.error("Failed to fetch schedules:", error);
+      return [];
+    }
 
-    return data;
+    return schedules;
   };
 
   /*****************************************
-   * @function matchSchedules
-   * @description 総あたりによるスケジュールのマッチング検索
+   * @function fetchUserRequestedSchedules
+   * @description ユーザーのリクエスト時間を取得
    *****************************************/
-  const matchSchedules = (allScheduleData) => {};
+  const fetchUserRequestedSchedules = async (allSchedules) => {
+    const {
+      data: { user },
+    } = await supabaseClient.auth.getUser();
+
+    const userRequestTime = allSchedules.filter(
+      (item) => item.profiles.user_id === user.id
+    );
+    setUserRequestTimes(userRequestTime);
+  };
 
   useEffect(() => {
     const fetchData = async () => {
-      const allScheduleData = await getAllData();
+      const allScheduleData = await fetchAllSchedules();
 
       if (allScheduleData.length) {
-        matchSchedules(allScheduleData);
         setAllSchedules([...allScheduleData]);
+        fetchUserRequestedSchedules(allScheduleData);
       }
     };
 
@@ -55,9 +115,14 @@ const Result = () => {
     <main
       className={`flex min-h-screen flex-col items-center justify-center py-16 px-3 bg-[#f1c232]`}
     >
+      <LogoutBtn doLogout={doLogout} />
+
       <div className="w-full max-w-2xl p-10 bg-white shadow-xl rounded-2xl">
         <Heading text={"Matching Result"} />
-        <UserRequestTime />
+        <UserRequestTime
+          userRequestTimes={userRequestTimes}
+          handleScheduleChange={handleScheduleChange}
+        />
         <ResultsInfo count={allSchedules.length} />
 
         <div className="p-0 border-t-2 border-gray-200 border-solid border-b-0 border-l-0 border-r-0">
@@ -73,3 +138,20 @@ const Result = () => {
 };
 
 export default Result;
+
+export const getServerSideProps = async (ctx) => {
+  const supabase = createPagesServerClient(ctx);
+  const {
+    data: { session },
+  } = await supabase.auth.getSession();
+  if (!session)
+    return {
+      redirect: {
+        destination: "/login",
+        permanent: false,
+      },
+    };
+  return {
+    props: {},
+  };
+};
