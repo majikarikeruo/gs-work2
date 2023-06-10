@@ -22,8 +22,11 @@ import ResultItem from "@/components/result/ResultItem";
 import LogoutBtn from "@/components/common/LogoutBtn";
 
 const Result = () => {
+  /** useState */
   const [allSchedules, setAllSchedules] = useState([]);
   const [userRequestTimes, setUserRequestTimes] = useState([]);
+
+  /** library */
   const router = useRouter();
   const supabaseClient = useSupabaseClient();
 
@@ -42,28 +45,33 @@ const Result = () => {
     }
   };
   /*****************************************
-   * @function getAllData
+   * @function fetchAllSchedules
    * @description
    *****************************************/
-  const getAllData = async () => {
-    const { data, error } = await supabase
+  const fetchAllSchedules = async () => {
+    const { data: schedules, error } = await supabase
       .from("schedules")
       .select(
         "startTime, endTime, dayofWeek,profiles: user_id ( user_name,user_id )"
       );
-    return data;
+    if (error) {
+      console.error("Failed to fetch schedules:", error);
+      return [];
+    }
+
+    return schedules;
   };
 
   /*****************************************
-   * @function getUserRequestTime
+   * @function fetchUserRequestedSchedules
    * @description ユーザーのリクエスト時間を取得
    *****************************************/
-  const getUserRequestTime = async (allScheduleData) => {
+  const fetchUserRequestedSchedules = async (allSchedules) => {
     const {
       data: { user },
     } = await supabaseClient.auth.getUser();
 
-    const userRequestTime = allScheduleData.filter(
+    const userRequestTime = allSchedules.filter(
       (item) => item.profiles.user_id === user.id
     );
     setUserRequestTimes(userRequestTime);
@@ -71,11 +79,11 @@ const Result = () => {
 
   useEffect(() => {
     const fetchData = async () => {
-      const allScheduleData = await getAllData();
+      const allScheduleData = await fetchAllSchedules();
 
       if (allScheduleData.length) {
         setAllSchedules([...allScheduleData]);
-        getUserRequestTime(allScheduleData);
+        fetchUserRequestedSchedules(allScheduleData);
       }
     };
 
