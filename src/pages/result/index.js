@@ -4,6 +4,8 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/router";
 
+import useAuth from "@/hooks/useAuth";
+
 /**
  * Library
  */
@@ -25,6 +27,9 @@ const Result = () => {
   /** useState */
   const [mySchedules, setMySchedules] = useState([]);
   const [otherSchedules, setOtherSchedules] = useState([]);
+
+  /** Custom Hooks */
+  const { doLogout, error } = useAuth();
 
   /** library */
   const router = useRouter();
@@ -57,20 +62,6 @@ const Result = () => {
     setOtherSchedules(schedule || []);
   };
 
-  /******************************
-   * @function doLogout
-   * @description ログアウト処理
-   ******************************/
-  const doLogout = async () => {
-    try {
-      const { error } = await supabaseClient.auth.signOut();
-      if (error) throw error;
-
-      router.replace("/login");
-    } catch (error) {
-      alert(error.message);
-    }
-  };
   /*****************************************
    * @function fetchSchedules
    * @description スケジュールを取得

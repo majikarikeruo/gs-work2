@@ -4,6 +4,8 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/router";
 
+import useAuth from "@/hooks/useAuth";
+
 /**
  * Library
  */
@@ -30,6 +32,9 @@ export default function Vote({ user }) {
   const [username, setUsername] = useState("");
   const [schedules, setSchedules] = useState([]);
 
+  /** Custom Hooks */
+  const { doLogout, error } = useAuth();
+
   //Library
   const router = useRouter();
   const supabaseClient = useSupabaseClient();
@@ -48,21 +53,6 @@ export default function Vote({ user }) {
     } catch (error) {
       console.error("セッション情報の取得に失敗しました:", error.message);
       // エラーハンドリングの処理を追加することができます
-    }
-  };
-
-  /******************************
-   * @function doLogout
-   * @description ログアウト処理
-   ******************************/
-  const doLogout = async () => {
-    try {
-      const { error } = await supabaseClient.auth.signOut();
-      if (error) throw error;
-
-      router.replace("/login");
-    } catch (error) {
-      alert(error.message);
     }
   };
 
