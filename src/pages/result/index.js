@@ -8,7 +8,7 @@ import { useRouter } from "next/router";
  * Library
  */
 import { supabase } from "@/lib/supabase";
-import { useSupabaseClient, useUser } from "@supabase/auth-helpers-react";
+import { useSupabaseClient } from "@supabase/auth-helpers-react";
 import { createPagesServerClient } from "@supabase/auth-helpers-nextjs";
 
 /**
@@ -36,7 +36,12 @@ const Result = () => {
    ******************************/
 
   const handleScheduleChange = async (e) => {
-    console.log(e.target.value);
+    if (!e.target.value) {
+      fetchData();
+      setOtherSchedules([]);
+      return;
+    }
+
     const [dayofWeek, startTime, endTime, id] = e.target.value.split(" ");
 
     const { data: schedule } = await supabase
@@ -45,9 +50,10 @@ const Result = () => {
         "startTime, endTime, dayofWeek, profiles: user_id ( user_name,id )"
       )
       .eq("dayofWeek", dayofWeek)
-      .neq("user_id", id);
+      .neq("user_id", id)
+      .lt("startTime", endTime)
+      .gt("endTime", startTime);
 
-    console.log(schedule, id);
     setOtherSchedules(schedule || []);
   };
 
@@ -70,43 +76,53 @@ const Result = () => {
    * @description スケジュールを取得
    *****************************************/
   const fetchSchedules = async () => {
-    const { data: schedules, error } = await supabase
-      .from("schedules")
-      .select(
-        "startTime, endTime, dayofWeek,profiles: user_id ( user_name,id,user_id )"
-      );
+    try {
+      const { data: schedules, error } = await supabase
+        .from("schedules")
+        .select(
+          "startTime, endTime, dayofWeek,profiles: user_id ( user_name,id,user_id )"
+        );
 
-    console.log(schedules);
-    if (error) {
+      if (error) throw error;
+
+      return schedules;
+    } catch (error) {
+      alert(error.message);
       return [];
     }
+  };
+  /*****************************************
+   * @function fetchData
+   * @description データを取得
+   *****************************************/
+  const fetchData = async () => {
+    const {
+      data: { user },
+    } = await supabaseClient.auth.getUser();
+    const allSchedules = await fetchSchedules();
 
-    return schedules;
+    if (!allSchedules.length) {
+      return false;
+    }
+
+    const mySchedules = [];
+    const otherSchedules = [];
+
+    allSchedules.forEach((schedule) => {
+      const {
+        profiles: { user_id },
+      } = schedule;
+
+      user_id === user.id
+        ? mySchedules.push(schedule)
+        : otherSchedules.push(schedule);
+    });
+
+    setMySchedules(mySchedules || []);
+    setOtherSchedules(otherSchedules || []);
   };
 
   useEffect(() => {
-    const fetchData = async () => {
-      const {
-        data: { user },
-      } = await supabaseClient.auth.getUser();
-      const allSchedules = await fetchSchedules();
-
-      const mySchedules = allSchedules.filter(
-        ({ profiles: { user_id } }) => user_id === user.id
-      );
-      const otherSchedules = allSchedules.filter(
-        ({ profiles: { user_id } }) => user_id !== user.id
-      );
-      console.log(mySchedules, "mySchedules");
-      console.log(otherSchedules, "otherSchedules");
-
-      if (!allSchedules.length) {
-        return false;
-      }
-      setMySchedules(mySchedules || []);
-      setOtherSchedules(otherSchedules || []);
-    };
-
     fetchData();
   }, []);
 

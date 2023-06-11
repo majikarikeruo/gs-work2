@@ -29,6 +29,8 @@ export default function Vote({ user }) {
   const [userInfo, setUserInfo] = useState(null);
   const [username, setUsername] = useState("");
   const [schedules, setSchedules] = useState([]);
+
+  //Library
   const router = useRouter();
   const supabaseClient = useSupabaseClient();
 
@@ -37,11 +39,16 @@ export default function Vote({ user }) {
    * @description ログインユーザーセッション情報取得
    ******************************/
   const getSession = async () => {
-    const {
-      data: { session },
-    } = await supabaseClient.auth.getSession();
+    try {
+      const {
+        data: { session },
+      } = await supabaseClient.auth.getSession();
 
-    setUserInfo(session.user);
+      setUserInfo(session.user);
+    } catch (error) {
+      console.error("セッション情報の取得に失敗しました:", error.message);
+      // エラーハンドリングの処理を追加することができます
+    }
   };
 
   /******************************
@@ -68,6 +75,7 @@ export default function Vote({ user }) {
       .from(table)
       .upsert(data, { onConflict })
       .select();
+
     if (error) {
       throw new Error(error.message);
     }
