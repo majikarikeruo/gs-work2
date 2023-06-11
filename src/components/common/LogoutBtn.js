@@ -1,4 +1,9 @@
-const LogoutBtn = ({ doLogout }) => {
+import useAuth from "@/hooks/useAuth";
+
+const LogoutBtn = ({}) => {
+  /** Custom Hooks */
+  const { doLogout, error } = useAuth();
+
   return (
     <div className="fixed right-4 top-4">
       <button

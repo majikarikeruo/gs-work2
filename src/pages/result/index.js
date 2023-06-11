@@ -4,8 +4,6 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/router";
 
-import useAuth from "@/hooks/useAuth";
-
 /**
  * Library
  */
@@ -28,11 +26,7 @@ const Result = () => {
   const [mySchedules, setMySchedules] = useState([]);
   const [otherSchedules, setOtherSchedules] = useState([]);
 
-  /** Custom Hooks */
-  const { doLogout, error } = useAuth();
-
   /** library */
-  const router = useRouter();
   const supabaseClient = useSupabaseClient();
 
   /******************************
@@ -121,7 +115,7 @@ const Result = () => {
     <main
       className={`flex min-h-screen flex-col items-center justify-center py-16 px-3 bg-[#f1c232]`}
     >
-      <LogoutBtn doLogout={doLogout} />
+      <LogoutBtn />
 
       <div className="w-full max-w-2xl p-10 bg-white shadow-xl rounded-2xl">
         <Heading text={"Matching Result"} />

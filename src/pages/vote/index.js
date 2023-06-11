@@ -4,8 +4,6 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/router";
 
-import useAuth from "@/hooks/useAuth";
-
 /**
  * Library
  */
@@ -32,11 +30,7 @@ export default function Vote({ user }) {
   const [username, setUsername] = useState("");
   const [schedules, setSchedules] = useState([]);
 
-  /** Custom Hooks */
-  const { doLogout, error } = useAuth();
-
   //Library
-  const router = useRouter();
   const supabaseClient = useSupabaseClient();
 
   /******************************
@@ -119,7 +113,7 @@ export default function Vote({ user }) {
     <main
       className={`flex min-h-screen flex-col items-center justify-center py-16 px-3 bg-[#f1c232]`}
     >
-      <LogoutBtn doLogout={doLogout} />
+      <LogoutBtn />
       <div className="w-full max-w-xl p-10 bg-white shadow-xl  rounded-2xl">
         <Heading text={"Mokumoku Matching"} />
 
