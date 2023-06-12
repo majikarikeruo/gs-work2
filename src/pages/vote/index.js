@@ -112,7 +112,8 @@ export default function Vote(pageProps) {
       className={`flex min-h-screen flex-col items-center justify-center py-16 px-3 bg-[#f1c232]`}
     >
       <LogoutBtn />
-      <div className="w-full max-w-xl p-10 bg-white shadow-xl rounded-2xl">
+
+      <div className="box-border w-full max-w-xl p-4 md:p-10 bg-white shadow-xl rounded-2xl">
         <Heading text={"Mokumoku Matching"} />
 
         <form className="mt-8">
@@ -163,8 +164,11 @@ export default function Vote(pageProps) {
           <LimitAlertMsg />
 
           <div className="mt-10 text-center">
-            <SubmitButton text="日程登録" handleSubmit={submitSchedule} />
-            <LinkButton url="/result" text="結果を見る" />
+            <SubmitButton
+              text="希望日程を登録する"
+              handleSubmit={submitSchedule}
+            />
+            <LinkButton url="/result" text="マッチングの結果を見る" />
           </div>
         </form>
       </div>

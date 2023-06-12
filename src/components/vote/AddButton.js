@@ -17,10 +17,10 @@ const AddButton = ({ scheduleCount, setScheduleCount }) => {
         <div className="text-center">
           <button
             type="button"
-            className="w-[38px] lg:w-[46px] h-[38px] lg:h-[46px] border-none  bg-[#f1c232] text-white font-bold text-lg rounded-md cursor-pointer"
+            className="h-[38px] lg:h-[46px] border-none px-4 shadow-md bg-[#f1c232] text-white font-bold text-lg rounded-md cursor-pointer"
             onClick={(e) => addScheduleCount()}
           >
-            ＋
+            <span className="mr-2">＋</span>希望日程入力を追加
           </button>
         </div>
       )}

@@ -14,8 +14,8 @@ import { useSupabaseClient } from "@supabase/auth-helpers-react";
  */
 import Heading from "@/components/common/Heading";
 import LinkButton from "@/components/common/LinkButton";
-import ResultsInfo from "@/components/result/ResultsInfo";
-import UserRequestTime from "@/components/result/UserRequestTime";
+import ResultsInfoPanel from "@/components/result/ResultsInfoPanel";
+import SearchConditionPanel from "@/components/result/SearchConditionPanel";
 import ResultItem from "@/components/result/ResultItem";
 import LogoutBtn from "@/components/common/LogoutBtn";
 
@@ -115,13 +115,13 @@ const Results = () => {
     >
       <LogoutBtn />
 
-      <div className="box-border  w-full max-w-xl  p-4 md:p-10 bg-white shadow-xl rounded-2xl">
+      <div className="box-border w-full max-w-xl p-4 md:p-10 bg-white shadow-xl rounded-2xl">
         <Heading text={"Matching Result"} />
-        <UserRequestTime
+        <SearchConditionPanel
           mySchedules={mySchedules}
           handleChange={handleScheduleChange}
         />
-        <ResultsInfo count={otherSchedules.length} />
+        <ResultsInfoPanel count={otherSchedules.length} />
 
         <div className="p-0 border-t-2 border-gray-200 border-solid border-b-0 border-l-0 border-r-0">
           {otherSchedules.map((schedule, index) => (
@@ -129,7 +129,9 @@ const Results = () => {
           ))}
         </div>
 
-        <LinkButton url="/" text="もくもく会の希望日時を入力し直す" />
+        <div className="mt-10 text-center">
+          <LinkButton url="/vote" text="もくもく会の希望日時を入力し直す" />
+        </div>
       </div>
     </main>
   );

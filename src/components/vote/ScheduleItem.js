@@ -8,18 +8,6 @@ import { useState, useEffect } from "react";
  */
 import { supabase } from "@/lib/supabase";
 
-/**
- *
- * Todo
- *
- * -  集計ページの作成
- * - デザイン演出リッチに
- *
- *
- *
- *
- */
-
 const ScheduleItem = ({
   index,
   scheduleCount,
@@ -89,15 +77,15 @@ const ScheduleItem = ({
 
   return (
     <tr>
-      <td className="p-1 lg:p-2">
+      <td className="p-1 lg:p-2 w-[112px]">
         <select
           name="dayofWeek"
-          className="w-full box-border leading-loose border-gray-200 border-solid border-2 p-1 lg:p-2 px-3 h-[38px] lg:h-[46px] text-base"
+          className="w-[112px] box-border leading-loose border-gray-200 border-solid border-2 p-1 lg:p-2 px-1 h-[38px] lg:h-[46px] text-base"
           onChange={(e) => changeScheduleProps("dayofWeek", e.target.value)}
           value={dayofWeek}
         >
           <option value="" disabled>
-            選択してください
+            曜日を選択
           </option>
           <option value="weekday">平日</option>
           <option value="weekend">週末</option>
@@ -110,24 +98,24 @@ const ScheduleItem = ({
           <option value="sun">日曜</option>
         </select>
       </td>
-      <td className="p-1 lg:p-2">
+      <td className="p-1 lg:p-2 w-[80px]">
         <input
           type="time"
           step={1800}
           name="startTime"
           value={startTime}
           onChange={(e) => changeScheduleProps("startTime", e.target.value)}
-          className="w-full box-border border-gray-200 border-solid border-2 p-1 lg:p-2  text-base"
+          className="w-[94px] box-border border-gray-200 border-solid border-2 p-1 lg:p-2  text-base"
         />
       </td>
-      <td className="p-1 lg:p-2">
+      <td className="p-1 lg:p-2 w-[80px]">
         <input
           type="time"
           step={1800}
           name="endTime"
           value={endTime}
           onChange={(e) => changeScheduleProps("endTime", e.target.value)}
-          className="w-full box-border border-gray-200 border-solid border-2 p-1 lg:p-2  text-base"
+          className="w-[94px] box-border border-gray-200 border-solid border-2 p-1 lg:p-2  text-base"
         />
       </td>
       <td className="p-1 lg:p-2">
@@ -135,9 +123,9 @@ const ScheduleItem = ({
           <button
             type="button"
             onClick={(e) => removeScheduleCount()}
-            className="box-border bg-white border-red-500 border-solid border-2 text-red-500 w-[38px] lg:w-[46px]  h-[38px] lg:h-[46px] text-2xl"
+            className="px-3 w-[38px] box-border bg-white border-red-500 border-solid border-2 text-red-500  h-[38px] lg:h-[46px]"
           >
-            -
+            <span className="mr-2 text-2xl align-middle">-</span>
           </button>
         )}
       </td>
