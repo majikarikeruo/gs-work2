@@ -1,7 +1,6 @@
 /**
  * Library
  */
-import { createPagesServerClient } from "@supabase/auth-helpers-nextjs";
 
 import Link from "next/link";
 
@@ -13,20 +12,3 @@ export default function Home() {
     </div>
   );
 }
-
-export const getServerSideProps = async (ctx) => {
-  const supabase = createPagesServerClient(ctx);
-  const {
-    data: { session },
-  } = await supabase.auth.getSession();
-  if (session)
-    return {
-      redirect: {
-        destination: "/vote",
-        permanent: false,
-      },
-    };
-  return {
-    props: {},
-  };
-};

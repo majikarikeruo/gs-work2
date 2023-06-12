@@ -3,13 +3,11 @@
  */
 import { useState, useEffect } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
 
 /**
  * Library
  */
 import { useSupabaseClient, useUser } from "@supabase/auth-helpers-react";
-import { createPagesServerClient } from "@supabase/auth-helpers-nextjs";
 /**
  * Components
  */
@@ -23,7 +21,6 @@ import SubmitButton from "@/components/vote/SubmitButton";
 export default function Register() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const router = useRouter();
   const supabaseClient = useSupabaseClient();
 
   /**
@@ -80,20 +77,3 @@ export default function Register() {
     </main>
   );
 }
-
-export const getServerSideProps = async (ctx) => {
-  const supabase = createPagesServerClient(ctx);
-  const {
-    data: { session },
-  } = await supabase.auth.getSession();
-  if (session)
-    return {
-      redirect: {
-        destination: "/vote",
-        permanent: false,
-      },
-    };
-  return {
-    props: {},
-  };
-};

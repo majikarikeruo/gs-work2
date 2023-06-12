@@ -7,7 +7,7 @@ const montserrat = Montserrat({
 
 const Heading = ({ text }) => {
   return (
-    <div className="mb-20">
+    <div className="mb-12">
       <h1 className={`text-4xl font-bold text-center ${montserrat.className}`}>
         {text}
       </h1>

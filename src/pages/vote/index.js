@@ -2,14 +2,12 @@
  * React
  */
 import { useState, useEffect } from "react";
-import { useRouter } from "next/router";
 
 /**
  * Library
  */
 import { supabase } from "@/lib/supabase";
-import { useSupabaseClient, useUser } from "@supabase/auth-helpers-react";
-import { createPagesServerClient } from "@supabase/auth-helpers-nextjs";
+import { useSupabaseClient } from "@supabase/auth-helpers-react";
 
 /**
  * Components
@@ -17,10 +15,10 @@ import { createPagesServerClient } from "@supabase/auth-helpers-nextjs";
 import Heading from "@/components/common/Heading";
 import Label from "@/components/common/Label";
 import Input from "@/components/common/Input";
-import Text from "@/components/common/Text";
 import AddButton from "@/components/vote/AddButton";
 import SubmitButton from "@/components/vote/SubmitButton";
 import ScheduleItem from "@/components/vote/ScheduleItem";
+import LimitAlertMsg from "@/components/vote/LimitAlertMsg";
 import LinkButton from "@/components/common/LinkButton";
 import LogoutBtn from "@/components/common/LogoutBtn";
 
@@ -114,7 +112,7 @@ export default function Vote(pageProps) {
       className={`flex min-h-screen flex-col items-center justify-center py-16 px-3 bg-[#f1c232]`}
     >
       <LogoutBtn />
-      <div className="w-full max-w-xl p-10 bg-white shadow-xl  rounded-2xl">
+      <div className="w-full max-w-xl p-10 bg-white shadow-xl rounded-2xl">
         <Heading text={"Mokumoku Matching"} />
 
         <form className="mt-8">
@@ -123,22 +121,24 @@ export default function Vote(pageProps) {
             <Input data={username} handle={setUsername} />
           </div>
           <div className="mb-10">
-            <Label text="もくもく会希望曜日・日時の入力" />
-            <span className="text-red-500 text-sm">※上限5個まで</span>
-            <Text text="もくもく会を希望する曜日・日時を以下から入力ください。" />
+            <Label text="もくもく会・希望曜日と日時の入力" />
 
             <table className="w-full mb-4 -mx-2">
               <thead>
                 <tr>
-                  <th className="p-2 text-left align-top">
+                  <th className="p-2 text-left align-top font-medium">
                     曜日
                     <br className="lg:hidden" />
                     <span className="text-[10px] lg:text-base">
                       （週末・平日）
                     </span>
                   </th>
-                  <th className="p-2 text-left align-top">開始時間</th>
-                  <th className="p-2 text-left align-top">終了時間</th>
+                  <th className="p-2 text-left align-top font-medium">
+                    開始時間
+                  </th>
+                  <th className="p-2 text-left align-top font-medium">
+                    終了時間
+                  </th>
                 </tr>
               </thead>
               <tbody>
@@ -160,9 +160,9 @@ export default function Vote(pageProps) {
               setScheduleCount={setScheduleCount}
             />
           </div>
+          <LimitAlertMsg />
 
-          <div className="mt-20 text-center">
-            <Text text="あくまで、基本的に何曜日何時くらいがいいかという希望を入れていただければ大丈夫です！" />
+          <div className="mt-10 text-center">
             <SubmitButton text="日程登録" handleSubmit={submitSchedule} />
             <LinkButton url="/result" text="結果を見る" />
           </div>

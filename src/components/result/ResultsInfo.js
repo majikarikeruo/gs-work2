@@ -1,7 +1,6 @@
 /**
  * React
  */
-
 import Button from "@/components/common/Button";
 
 const ResultsInfo = ({ count }) => {

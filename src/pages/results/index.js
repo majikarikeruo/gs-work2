@@ -2,14 +2,12 @@
  * React
  */
 import { useEffect, useState } from "react";
-import { useRouter } from "next/router";
 
 /**
  * Library
  */
 import { supabase } from "@/lib/supabase";
 import { useSupabaseClient } from "@supabase/auth-helpers-react";
-import { createPagesServerClient } from "@supabase/auth-helpers-nextjs";
 
 /**
  * Components
@@ -21,7 +19,7 @@ import UserRequestTime from "@/components/result/UserRequestTime";
 import ResultItem from "@/components/result/ResultItem";
 import LogoutBtn from "@/components/common/LogoutBtn";
 
-const Result = () => {
+const Results = () => {
   /** useState */
   const [mySchedules, setMySchedules] = useState([]);
   const [otherSchedules, setOtherSchedules] = useState([]);
@@ -117,7 +115,7 @@ const Result = () => {
     >
       <LogoutBtn />
 
-      <div className="w-full max-w-2xl p-10 bg-white shadow-xl rounded-2xl">
+      <div className="box-border  w-full max-w-xl  p-4 md:p-10 bg-white shadow-xl rounded-2xl">
         <Heading text={"Matching Result"} />
         <UserRequestTime
           mySchedules={mySchedules}
@@ -131,27 +129,10 @@ const Result = () => {
           ))}
         </div>
 
-        <LinkButton url="/" text="投票ページに戻る" />
+        <LinkButton url="/" text="もくもく会の希望日時を入力し直す" />
       </div>
     </main>
   );
 };
 
-export default Result;
-
-export const getServerSideProps = async (ctx) => {
-  const supabase = createPagesServerClient(ctx);
-  const {
-    data: { session },
-  } = await supabase.auth.getSession();
-  if (!session)
-    return {
-      redirect: {
-        destination: "/login",
-        permanent: false,
-      },
-    };
-  return {
-    props: {},
-  };
-};
+export default Results;

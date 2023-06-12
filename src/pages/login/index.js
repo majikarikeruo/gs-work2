@@ -9,7 +9,6 @@ import { useRouter } from "next/router";
  * Library
  */
 import { useSupabaseClient, useUser } from "@supabase/auth-helpers-react";
-import { createPagesServerClient } from "@supabase/auth-helpers-nextjs";
 
 /**
  * Components

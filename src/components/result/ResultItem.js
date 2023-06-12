@@ -3,6 +3,11 @@
  */
 import Image from "next/image";
 
+/**
+ * Constant
+ */
+import { dayofWeek } from "@/constant/dayOfWeek";
+
 const ResultItem = ({ schedule }) => {
   return (
     <div className="flex justify-between items-center py-4 list-none border-b-2 border-gray-200 border-solid border-t-0 border-l-0 border-r-0">
@@ -27,11 +32,17 @@ const ResultItem = ({ schedule }) => {
         </p>
       </div>
       <div className="flex text-lg justify-end">
-        <span className="inline-block mr-6">{schedule.dayofWeek}</span>
+        <span className="inline-block mr-6">
+          {dayofWeek[schedule.dayofWeek]}
+        </span>
         <div>
-          <span className="inline-block mx-2">{schedule.startTime}</span>
+          <span className="inline-block mx-2">
+            {schedule.startTime.slice(0, -3)}
+          </span>
           <span className="inline-block mx-1">-</span>
-          <span className="inline-block mx-2">{schedule.endTime}</span>
+          <span className="inline-block mx-2">
+            {schedule.endTime.slice(0, -3)}
+          </span>
         </div>
       </div>
     </div>
