@@ -12,7 +12,7 @@ export default function App({ Component, pageProps }) {
       supabaseClient={supabaseClient}
       initialSession={pageProps.initialSession}
     >
-      <Component {...pageProps} />
+      <Component pageProps={...pageProps} />
     </SessionContextProvider>
   );
 }

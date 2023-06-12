@@ -24,7 +24,7 @@ import ScheduleItem from "@/components/vote/ScheduleItem";
 import LinkButton from "@/components/common/LinkButton";
 import LogoutBtn from "@/components/common/LogoutBtn";
 
-export default function Vote({ user }) {
+export default function Vote(pageProps) {
   const [scheduleCount, setScheduleCount] = useState(1);
   const [userInfo, setUserInfo] = useState(null);
   const [username, setUsername] = useState("");
@@ -171,21 +171,3 @@ export default function Vote({ user }) {
     </main>
   );
 }
-
-export const getServerSideProps = async (ctx) => {
-  const supabase = createPagesServerClient(ctx);
-  const {
-    data: { session },
-  } = await supabase.auth.getSession();
-
-  if (!session)
-    return {
-      redirect: {
-        destination: "/login",
-        permanent: false,
-      },
-    };
-  return {
-    props: {},
-  };
-};

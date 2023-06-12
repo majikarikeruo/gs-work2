@@ -86,21 +86,3 @@ export default function Login() {
     </main>
   );
 }
-
-export const getServerSideProps = async (ctx) => {
-  const supabase = createPagesServerClient(ctx);
-  const {
-    data: { session },
-  } = await supabase.auth.getSession();
-
-  if (session)
-    return {
-      redirect: {
-        destination: "/vote",
-        permanent: false,
-      },
-    };
-  return {
-    props: {},
-  };
-};
